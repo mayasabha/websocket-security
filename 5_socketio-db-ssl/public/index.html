@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Socket.IO chat</title>
+        <style>
+            body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+            #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+            #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+            #input:focus { outline: none; }
+            #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+            #messages { list-style-type: none; margin: 0; padding: 0; }
+            #messages > li { padding: 0.5rem 1rem; }
+            #messages > li:nth-child(odd) { background: #efefef; }
+        </style>
+    </head>
+    <body>
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" /><button>Send</button>
+        </form>
+        <!--<script src="/socket.io/socket.io.js"></script>-->
+        <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            const socket = io('wss://sde.apoorvpal.in:2087', {
+                reconnectionDelay: 1000,
+                reconnection: true,
+                reconnectionAttemps: 10,
+                transports: ['websocket'],
+                agent: false,
+                upgrade: false,
+                rejectUnauthorized: false
+            });
+
+            const messages = [
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse at leo nunc. Integer tincidunt mi a sem consequat molestie. Nulla ultrices rhoncus aliquet. Morbi ac laoreet enim. Donec sem urna, blandit vel mauris et, porttitor pharetra magna. Sed cursus, ligula a commodo pulvinar, urna purus suscipit enim, vitae iaculis quam tortor eget justo. Vestibulum ut sodales elit, at bibendum libero. Pellentesque sit amet molestie orci. Curabitur fermentum fermentum ex, elementum mattis mauris pharetra et. Sed elit neque, maximus in nibh non, fermentum eleifend mauris. Donec vel tempus dolor. Praesent nec sagittis arcu. Cras vitae nunc a augue ultricies varius. Sed dapibus, nunc at luctus posuere, leo velit faucibus massa, et sollicitudin elit risus lobortis leo.",
+                "Nulla imperdiet metus eu erat commodo tristique. Cras auctor hendrerit tortor, vel sagittis massa aliquet in. Suspendisse pellentesque elit id tristique viverra. Ut dapibus lacinia felis, nec elementum urna scelerisque a. Pellentesque sollicitudin leo euismod orci varius venenatis. Duis consectetur feugiat odio quis ullamcorper. Suspendisse at porttitor lacus. Etiam condimentum lectus eget tristique lacinia. Vestibulum imperdiet auctor viverra. Etiam mattis aliquet mi iaculis gravida. Nunc tincidunt malesuada erat sed posuere. Donec ultricies tempus nibh eget fermentum. Cras efficitur interdum sem consequat aliquam.",
+                "Maecenas interdum nulla at sapien placerat, eu molestie ex ultrices. In nibh mauris, bibendum in auctor in, suscipit sit amet lacus. Morbi tincidunt sagittis lacus sed efficitur. Donec metus lectus, finibus sit amet vestibulum ut, pulvinar feugiat nisl. Suspendisse volutpat, ligula quis ultricies consequat, mauris felis volutpat odio, eget pharetra nulla purus eget arcu. Nam hendrerit tortor a felis pretium ullamcorper. Quisque suscipit sapien a blandit tempus. In velit est, aliquet in viverra non, accumsan efficitur magna. Duis pulvinar tempor tellus nec pulvinar.",
+                "Nunc commodo vehicula diam, eget placerat leo lacinia gravida. Cras quam elit, placerat sed feugiat id, ultrices sit amet lacus. Integer mauris quam, auctor quis semper non, molestie ac libero. Donec mollis ligula sit amet tortor euismod, et elementum dui pharetra. Maecenas ornare mollis leo, id auctor dui ultrices id. Fusce scelerisque sed felis ac porttitor. Etiam vel ipsum risus. In eleifend cursus neque vitae pellentesque. Cras ut maximus enim, viverra convallis mi. Etiam a nisi in diam aliquet pretium. Maecenas non est a nibh vulputate tempor. Suspendisse consequat a libero nec lacinia. Praesent lectus mi, aliquet ac arcu vitae, gravida ultricies elit.",
+                "Duis rutrum risus rhoncus venenatis bibendum. Pellentesque pharetra tristique eros maximus lacinia. Ut sollicitudin euismod ipsum sit amet condimentum. Phasellus placerat euismod nulla, vitae porta est semper vel. Fusce sagittis, nisl at pharetra vulputate, est ligula venenatis urna, vel ultrices diam lectus nec tellus. Phasellus non purus dictum, volutpat magna nec, placerat turpis. Nunc leo lorem, gravida eget quam at, elementum ornare dolor."
+            ];
+
+            let t0, t1, t2, t3, t4, t5;
+
+            let first_message_received = false;
+            let series_message_sent = false;
+
+            t0 = performance.now();
+
+            const username = 'apoorv';
+            const password = 'ApoorvSDETest123#';
+
+            let token = null;
+
+            socket.emit("login", {username: username, password: password});
+
+            socket.on('message', (data) => {
+                if (data == messages[0] && !first_message_received) {
+                    t3 = performance.now();
+                    console.log('Time Taken from First Message Sent to First Message Received', (t3 - t2));
+                    console.log('Total Time taken from Initialization to First Successful Bidirectional Conversation', (t3 - t0));
+                    first_message_received = true;
+                } else if (data == messages[4] && series_message_sent) {
+                    t5 = performance.now();
+                    const average_time = (t5 - t4) / 5;
+                    console.log('Average Time for each message sent and received', average_time);
+                }
+            });
+
+            socket.on('token', (receivedToken) => {
+                token = receivedToken;
+                console.log("Received Token", token);
+                t1 = performance.now();
+                console.log('Time Taken for initial setup', (t1 - t0));
+                t2 = performance.now();
+                console.log('Time Taken from Initialization to First Message Sent', (t2 - t0));
+                socket.send({token: token, data: messages[0]});
+                setTimeout(() => sendMessages(), 500);
+            });
+
+            socket.on('message', function message(data) {
+                // console.log("Received: %s", data);
+                if (data == messages[0] && !first_message_received) {
+                    t3 = performance.now();
+                    console.log('Time Taken from First Message Sent to First Message Received', (t3 - t2));
+                    console.log('Total Time taken from Initialization to First Successful Bidirectional Conversation', (t3 - t0));
+                    first_message_received = true;
+                } else if (data == messages[4] && series_message_sent) {
+                    t5 = performance.now();
+                    const average_time = (t5 - t4) / 5;
+                    console.log('Average Time for each message sent and received', average_time);
+                }
+            });
+
+            function sendMessages() {
+                t4 = performance.now();
+                messages.forEach(async (message) => {
+                    await socket.send({token: token, data: message});
+                });
+                series_message_sent = true;
+            }
+        </script>
+    </body>
+</html>
